@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+    mongo:
+        build:
+            context: database
+            dockerfile: Dockerfile
+        environment:
+            - MONGO_URI=${MONGO_URI}
+            - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+            - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+            - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+
+        ports:
+            - '27017:27017'
+        restart: on-failure
+
+    backend:
+        build:
+            context: server
+            dockerfile: Dockerfile
+        environment:
+            - SERVER_PORT=${SERVER_PORT}
+            - MONGO_URI=${MONGO_URI}
+        depends_on:
+            - mongo
+        ports:
+            - '5000:5000'
+        volumes:
+            - './server:/app'
